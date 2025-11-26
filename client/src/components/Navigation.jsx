@@ -1,7 +1,8 @@
 import React from 'react';
 import { Disclosure } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const navigation = [
 
@@ -27,6 +28,18 @@ function scrollToSection() {
 
 
 const Navigation = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Failed to logout', error);
+    }
+  };
+
   return (
     <Disclosure as="nav" className="bg-gray-800">
       {({ open }) => (
@@ -88,7 +101,34 @@ const Navigation = () => {
                   </div>
                 </div>
               </div>
-              <div className="absolute inset-y-0 right-0 hidden items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+              <div className="absolute inset-y-0 right-0 hidden items-center space-x-3 pr-2 sm:static sm:inset-auto sm:ml-6 sm:flex sm:pr-0">
+                {user ? (
+                  <>
+                    <span className="hidden text-sm text-gray-300 sm:inline">{user.email}</span>
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="rounded-md bg-indigo-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to="/login"
+                      className="rounded-md border border-white/30 px-4 py-2 text-sm font-semibold text-gray-100 hover:bg-gray-700"
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      to="/register"
+                      className="rounded-md bg-indigo-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400"
+                    >
+                      Register
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -109,6 +149,32 @@ const Navigation = () => {
                   {item.name}
                 </Disclosure.Button>
               ))}
+              <div className="mt-4 space-y-2 border-t border-gray-700 pt-3">
+                {user ? (
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="block w-full rounded-md bg-indigo-500 px-3 py-2 text-center text-base font-semibold text-white"
+                  >
+                    Logout
+                  </button>
+                ) : (
+                  <>
+                    <Link
+                      to="/login"
+                      className="block rounded-md border border-white/30 px-3 py-2 text-center text-base font-semibold text-gray-100"
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      to="/register"
+                      className="block rounded-md bg-indigo-500 px-3 py-2 text-center text-base font-semibold text-white"
+                    >
+                      Register
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           </Disclosure.Panel>
         </>
