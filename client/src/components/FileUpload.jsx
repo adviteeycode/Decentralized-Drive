@@ -2,17 +2,21 @@ import { useState } from "react";
 import axios from "axios";
 import "./FileUpload.css";
 import { API_Key, API_Secret } from "../utils/constants";
+import { useAuth } from "../context/AuthContext";
+import { recordFileUsage } from "../services/storageUsage";
 
 
 const FileUpload = ({ contract, account, provider }) => {
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("No image selected");
+  const { user } = useAuth();
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (file) {
+      const selectedFile = file;
       try {
         const formData = new FormData();
-        formData.append("file", file);
+        formData.append("file", selectedFile);
 
         const resFile = await axios({
           method: "post",
@@ -25,12 +29,20 @@ const FileUpload = ({ contract, account, provider }) => {
           },
         });
         const ImgHash = `https://gateway.pinata.cloud/ipfs/${resFile.data.IpfsHash}`;
-        contract.add(account,ImgHash);
+        await contract.add(account, ImgHash);
+        if (user) {
+          await recordFileUsage({
+            user,
+            bytes: selectedFile.size,
+            filename: selectedFile.name,
+          });
+        }
       
         // alert("Successfully Image Uploaded");
         setFileName("No image selected");
         setFile(null);
       } catch (e) {
+        console.error(e);
         alert("Unable to upload image to Pinata");
       }
     }
