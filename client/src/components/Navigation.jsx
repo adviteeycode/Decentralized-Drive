@@ -1,15 +1,14 @@
-import React from 'react';
-import { Disclosure } from '@headlessui/react'
+import React, { Fragment } from 'react';
+import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const navigation = [
-
-
-  { name: 'Upload', href: '/', current: true },
-  { name: 'View Files', href: "/#files", current: false },
+  { name: 'Home', href: '/', current: true },
+  { name: 'Files', href: '/#files', current: false },
   { name: 'Share', href: '/share', current: false },
+  { name: 'Profile', href: '/profile', current: false },
 ]
 
 function classNames(...classes) {
@@ -87,15 +86,16 @@ const Navigation = () => {
                     </Link>
 
 
-                    <Link
-                      key="ss"
-                      to='/share'
-
-
-                      className=" text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-                    >
-                      Share
-                    </Link>
+                    {navigation.map((nav) => (
+                      <Link
+                        key={nav.name}
+                        to={nav.href}
+                        onClick={nav.name === 'Files' ? scrollToSection : undefined}
+                        className=" text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
+                      >
+                        {nav.name}
+                      </Link>
+                    ))}
 
 
                   </div>
@@ -103,16 +103,53 @@ const Navigation = () => {
               </div>
               <div className="absolute inset-y-0 right-0 hidden items-center space-x-3 pr-2 sm:static sm:inset-auto sm:ml-6 sm:flex sm:pr-0">
                 {user ? (
-                  <>
-                    <span className="hidden text-sm text-gray-300 sm:inline">{user.email}</span>
-                    <button
-                      type="button"
-                      onClick={handleLogout}
-                      className="rounded-md bg-indigo-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400"
+                  <Menu as="div" className="relative">
+                    <div>
+                      <Menu.Button className="flex items-center gap-2 rounded-full bg-gray-700/80 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-600">
+                        <span className="hidden sm:inline">{user.email}</span>
+                        <span className="text-xs text-gray-300">▾</span>
+                      </Menu.Button>
+                    </div>
+                    <Transition
+                      as={Fragment}
+                      enter="transition ease-out duration-100"
+                      enterFrom="transform opacity-0 scale-95"
+                      enterTo="transform opacity-100 scale-100"
+                      leave="transition ease-in duration-75"
+                      leaveFrom="transform opacity-100 scale-100"
+                      leaveTo="transform opacity-0 scale-95"
                     >
-                      Logout
-                    </button>
-                  </>
+                      <Menu.Items className="absolute right-0 z-20 mt-2 w-48 origin-top-right rounded-xl bg-gray-900 py-2 shadow-2xl ring-1 ring-white/10 focus:outline-none">
+                        <Menu.Item>
+                          {({ active }) => (
+                            <Link
+                              to="/profile"
+                              className={classNames(
+                                active ? 'bg-gray-800 text-white' : 'text-gray-200',
+                                'block px-4 py-2 text-sm'
+                              )}
+                            >
+                              View Profile
+                            </Link>
+                          )}
+                        </Menu.Item>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <button
+                              type="button"
+                              onClick={handleLogout}
+                              className={classNames(
+                                active ? 'bg-gray-800 text-white' : 'text-gray-200',
+                                'block w-full px-4 py-2 text-left text-sm'
+                              )}
+                            >
+                              Logout
+                            </button>
+                          )}
+                        </Menu.Item>
+                      </Menu.Items>
+                    </Transition>
+                  </Menu>
                 ) : (
                   <>
                     <Link
@@ -151,13 +188,21 @@ const Navigation = () => {
               ))}
               <div className="mt-4 space-y-2 border-t border-gray-700 pt-3">
                 {user ? (
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="block w-full rounded-md bg-indigo-500 px-3 py-2 text-center text-base font-semibold text-white"
-                  >
-                    Logout
-                  </button>
+                  <>
+                    <Link
+                      to="/profile"
+                      className="block rounded-md border border-white/20 px-3 py-2 text-center text-base font-semibold text-gray-100"
+                    >
+                      View Profile
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="block w-full rounded-md bg-indigo-500 px-3 py-2 text-center text-base font-semibold text-white"
+                    >
+                      Logout
+                    </button>
+                  </>
                 ) : (
                   <>
                     <Link

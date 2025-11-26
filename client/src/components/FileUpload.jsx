@@ -4,14 +4,20 @@ import "./FileUpload.css";
 import { API_Key, API_Secret } from "../utils/constants";
 import { useAuth } from "../context/AuthContext";
 import { recordFileUsage } from "../services/storageUsage";
+import Spinner from "./Spinner";
 
 
 const FileUpload = ({ contract, account, provider }) => {
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("No image selected");
+  const [isUploading, setIsUploading] = useState(false);
   const { user } = useAuth();
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!file || isUploading) {
+      return;
+    }
+    setIsUploading(true);
     if (file) {
       const selectedFile = file;
       try {
@@ -46,6 +52,7 @@ const FileUpload = ({ contract, account, provider }) => {
         alert("Unable to upload image to Pinata");
       }
     }
+    setIsUploading(false);
     // alert("Successfully Image Uploaded");
     setFileName("No image selected");
     setFile(null);
@@ -75,8 +82,15 @@ const FileUpload = ({ contract, account, provider }) => {
           onChange={retrieveFile}
         />
         <span className="textArea">Image: {fileName}</span>
-        <button type="submit" className="upload" disabled={!file}>
-          Upload File
+        <button type="submit" className="upload flex items-center justify-center gap-2" disabled={!file || isUploading}>
+          {isUploading ? (
+            <>
+              <Spinner size="h-5 w-5" />
+              Uploading...
+            </>
+          ) : (
+            "Upload File"
+          )}
         </button>
       </form>
     </div>

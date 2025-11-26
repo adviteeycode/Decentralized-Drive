@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx'
 import AuthLayout from './components/AuthLayout.jsx'
 import AuthPage from './pages/AuthPage.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
+import Profile from './pages/Profile.jsx'
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
           {
             path: '/share',
             element: <Share />,
+          },
+          {
+            path: '/profile',
+            element: <Profile />,
           },
         ],
       },
